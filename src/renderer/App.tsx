@@ -23,7 +23,7 @@ export default (props: Props) => {
   // 串口通信
   // window.serialAPI.read(readHandle);
   const sendMsg = (task: CheckOutObj) => {
-    console.log('4444')
+    console.log('4444');
     return new Promise((resolve, reject) => {
       window.serialAPI.write(
         JSON.stringify({ [task.writeContent]: task.type }, undefined, 1)
@@ -40,17 +40,16 @@ export default (props: Props) => {
       //     return;
       //   }
 
-
       // });
 
       if (task.type === 'auto') {
-        console.log('ccc')
+        console.log('ccc');
         setTimeout(() => {
-          console.log('abc')
+          console.log('abc');
           changeCurrentTest(task.id, {
             status: 'success',
           });
-          console.log('ddd')
+          console.log('ddd');
           resolve(true);
         }, 2000);
       } else if (task.type === 'ack') {
@@ -95,7 +94,9 @@ export default (props: Props) => {
 
   // 重置测试项目
   const resetTestItem = () => {
-    window.serialAPI.close();
+    window.serialAPI.close((data: any) => {
+      console.log(data, 'data');
+    });
     setStart(false);
     test = testData.CHECK_OUT;
     setTest(testData.CHECK_OUT);
@@ -133,7 +134,7 @@ export default (props: Props) => {
     window.serialAPI.read((_: any, data: any) => {
       console.log(data, 'data');
       const respond = Uint8ArrayToString(data);
-      console.log(respond, 'respond')
+      console.log(respond, 'respond');
       Toast.destroyAll();
       Toast.info(respond);
     });
@@ -148,12 +149,12 @@ export default (props: Props) => {
   };
 
   const runTask = (task: CheckOutObj) => {
-    console.log('111')
+    console.log('111');
     setCurrentTest(task.id);
     changeCurrentTest(task.id, {
       status: 'loading',
     });
-    console.log('2222')
+    console.log('2222');
     return sendMsg(task);
   };
 
@@ -161,11 +162,13 @@ export default (props: Props) => {
 
   const portSelectChange = (port: string) => setPort(port);
 
-  useEffect(()=>{
-    return ()=>{
-      window.serialAPI.close();
-    }
-  },[])
+  useEffect(() => {
+    return () => {
+      window.serialAPI.close((data: any) => {
+        console.log(data, 'data');
+      });
+    };
+  }, []);
 
   return (
     <Space vertical>

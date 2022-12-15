@@ -48,8 +48,8 @@ contextBridge.exposeInMainWorld('serialAPI',{
     }
     return undefined;
   },
-  close: ()=>{
-    ipcRenderer.on('serial:close', null)
+  close: (callback: any)=>{
+    ipcRenderer.on('serial:close', callback)
   },
 })
 
