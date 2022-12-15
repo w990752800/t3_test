@@ -19,6 +19,7 @@ export default (props: Props) => {
   let [test, setTest] = useState(testData.CHECK_OUT);
   const [currentTest, setCurrentTest] = useState('');
   const [start, setStart] = useState(false);
+  let [respond, setRespond] = useState('');
 
   // 串口通信
   // window.serialAPI.read(readHandle);
@@ -44,14 +45,21 @@ export default (props: Props) => {
 
       if (task.type === 'auto') {
         console.log('ccc');
-        setTimeout(() => {
           console.log('abc');
-          changeCurrentTest(task.id, {
-            status: 'success',
-          });
-          console.log('ddd');
-          resolve(true);
-        }, 2000);
+          const timer = setInterval(()=>{
+            if(respond){
+              clearInterval(timer)
+              changeCurrentTest(task.id, {
+                status: !!respond?'success':'fail',
+              });
+              console.log('ddd');
+              respond = "";
+              setRespond(respond)
+              resolve(true);
+            }
+          }, 1000)
+
+
       } else if (task.type === 'ack') {
         Modal.destroyAll();
         Modal.confirm({
@@ -77,12 +85,19 @@ export default (props: Props) => {
       } else if (task.type === 'tip') {
         Toast.destroyAll();
         Toast.info(task.tip);
-        setTimeout(() => {
-          changeCurrentTest(task.id, {
-            status: 'success',
-          });
-          resolve(true);
-        }, 2000);
+        const timer = setInterval(()=>{
+          if(respond){
+            clearInterval(timer);
+            changeCurrentTest(task.id, {
+              status: !!respond?'success':'fail',
+            });
+            respond = ""
+            setRespond(respond)
+            resolve(true);
+          }
+        },1000)
+
+
       } else {
         changeCurrentTest(task.id, {
           status: 'fail',
@@ -94,9 +109,8 @@ export default (props: Props) => {
 
   // 重置测试项目
   const resetTestItem = () => {
-    window.serialAPI.close((data: any) => {
-      console.log(data, 'data');
-    });
+    respond = "";
+    setRespond(respond)
     setStart(false);
     test = testData.CHECK_OUT;
     setTest(testData.CHECK_OUT);
@@ -133,8 +147,9 @@ export default (props: Props) => {
     });
     window.serialAPI.read((_: any, data: any) => {
       console.log(data, 'data');
-      const respond = Uint8ArrayToString(data);
+      respond = Uint8ArrayToString(data);
       console.log(respond, 'respond');
+      setRespond(respond)
       Toast.destroyAll();
       Toast.info(respond);
     });

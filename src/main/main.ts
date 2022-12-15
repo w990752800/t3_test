@@ -24,12 +24,6 @@ export default class AppUpdater {
   }
 }
 
-const port = new SerialPort({
-  path: '/dev/tty-usbserial1',
-  baudRate: 57600,
-});
-console.log(port);
-
 let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('ipc-example', async (event, arg) => {
@@ -40,8 +34,7 @@ ipcMain.on('ipc-example', async (event, arg) => {
 });
 
 let sPort: any;
-ipcMain.on('serial:open', (event, path:string, bRate:number) => {
-  console.log("open port:"+path);
+const openPort = (path, bRate, event) => {
   sPort = new SerialPort({ path, baudRate: bRate, autoOpen: true }, (err) => {
     err?console.log("open port err", err, "\n"):null;
     setTimeout(()=>{
@@ -58,7 +51,28 @@ ipcMain.on('serial:open', (event, path:string, bRate:number) => {
     console.log('data', data);
     mainWindow?.webContents.send('serial:read', data)
   })
+}
+ipcMain.on('serial:open', (event, path:string, bRate:number) => {
+  console.log("open port:"+path);
+  if(sPort && sPort.isOpen){
+    console.log(sPort, sPort.isOpen)
+    sPort.close((err)=>{
+      console.log(err,'closeErr')
+      if(err){
+        event.reply('serial:open', {
+          err: true,
+          errMsg: '串口连接失败！'
+        })
+        return;
+      }
+      openPort(path, bRate, event)
+    })
+  }else {
+    openPort(path, bRate, event)
+  }
 })
+
+
 
 
 ipcMain.on('serial:write', (event, buf) => {
