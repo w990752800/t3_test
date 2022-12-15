@@ -24,7 +24,6 @@ export default (props: Props) => {
   // 串口通信
   // window.serialAPI.read(readHandle);
   const sendMsg = (task: CheckOutObj) => {
-    console.log('4444');
     return new Promise((resolve, reject) => {
       window.serialAPI.write(
         JSON.stringify({ [task.writeContent]: task.type }, undefined, 1)
@@ -44,22 +43,17 @@ export default (props: Props) => {
       // });
 
       if (task.type === 'auto') {
-        console.log('ccc');
-          console.log('abc');
-          const timer = setInterval(()=>{
-            if(respond){
-              clearInterval(timer)
-              changeCurrentTest(task.id, {
-                status: !!respond?'success':'fail',
-              });
-              console.log('ddd');
-              respond = "";
-              setRespond(respond)
-              resolve(true);
-            }
-          }, 1000)
-
-
+        const timer = setInterval(() => {
+          if (respond) {
+            clearInterval(timer);
+            changeCurrentTest(task.id, {
+              status: !!respond ? 'success' : 'fail',
+            });
+            respond = '';
+            setRespond(respond);
+            resolve(true);
+          }
+        }, 1000);
       } else if (task.type === 'ack') {
         Modal.destroyAll();
         Modal.confirm({
@@ -85,19 +79,17 @@ export default (props: Props) => {
       } else if (task.type === 'tip') {
         Toast.destroyAll();
         Toast.info(task.tip);
-        const timer = setInterval(()=>{
-          if(respond){
+        const timer = setInterval(() => {
+          if (respond) {
             clearInterval(timer);
             changeCurrentTest(task.id, {
-              status: !!respond?'success':'fail',
+              status: !!respond ? 'success' : 'fail',
             });
-            respond = ""
-            setRespond(respond)
+            respond = '';
+            setRespond(respond);
             resolve(true);
           }
-        },1000)
-
-
+        }, 1000);
       } else {
         changeCurrentTest(task.id, {
           status: 'fail',
@@ -109,8 +101,8 @@ export default (props: Props) => {
 
   // 重置测试项目
   const resetTestItem = () => {
-    respond = "";
-    setRespond(respond)
+    respond = '';
+    setRespond(respond);
     setStart(false);
     test = testData.CHECK_OUT;
     setTest(testData.CHECK_OUT);
@@ -134,7 +126,6 @@ export default (props: Props) => {
     // 串口连接
     window.serialAPI.open(port, 115200);
     window.serialAPI.on('serial:open', (data: any) => {
-      console.log(data, 'data');
       if (data && data.err) {
         // 串口连接失败！
         resetTestItem();
@@ -146,10 +137,8 @@ export default (props: Props) => {
       }
     });
     window.serialAPI.read((_: any, data: any) => {
-      console.log(data, 'data');
       respond = Uint8ArrayToString(data);
-      console.log(respond, 'respond');
-      setRespond(respond)
+      setRespond(respond);
       Toast.destroyAll();
       Toast.info(respond);
     });
@@ -157,19 +146,16 @@ export default (props: Props) => {
 
   const startTask = async () => {
     for (const task of Object.values(test)) {
-      console.log(task, 'task=>');
       await runTask(task);
     }
     setStart(false);
   };
 
   const runTask = (task: CheckOutObj) => {
-    console.log('111');
     setCurrentTest(task.id);
     changeCurrentTest(task.id, {
       status: 'loading',
     });
-    console.log('2222');
     return sendMsg(task);
   };
 

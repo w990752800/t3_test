@@ -66,8 +66,8 @@ export default (props: Props) => {
     <List
       style={{ width: '100%', fontSize: '20px' }}
       size="large"
-      header={<div>Header</div>}
-      footer={<div>Footer</div>}
+      //   header={<div>Header</div>}
+      //   footer={<div>Footer</div>}
       bordered
       dataSource={Object.values(list)}
       renderItem={(item) => (
