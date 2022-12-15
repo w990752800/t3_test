@@ -17,12 +17,14 @@ render(
   document.getElementById('root')
 );
 
-window.electron.ipcRenderer.once('ipc-example', (arg) => {
-  setTimeout(() => {
-    render(
-      <App ports={arg as Array<{ path: string }>} />,
-      document.getElementById('root')
-    );
-  }, 1000);
+window.electron.ipcRenderer.on('ipc-example', (arg) => {
+ setTimeout(()=>{
+  render(
+    <App ports={arg as Array<{ path: string }>} />,
+    document.getElementById('root')
+  );
+ },1000)
+
 });
-window.electron.ipcRenderer.myPing();
+
+  window.electron.ipcRenderer.myPing();

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Space, BackTop, Toast, Modal } from '@douyinfe/semi-ui';
 
 import './App.css';
@@ -23,71 +23,79 @@ export default (props: Props) => {
   // 串口通信
   // window.serialAPI.read(readHandle);
   const sendMsg = (task: CheckOutObj) => {
+    console.log('4444')
     return new Promise((resolve, reject) => {
       window.serialAPI.write(
         JSON.stringify({ [task.writeContent]: task.type }, undefined, 1)
       );
-      window.serialAPI.on('serial:write', (data: any) => {
-        if (data && data.err) {
-          changeCurrentTest(task.id, {
-            status: 'fail',
-          });
-          resolve(false);
-          Toast.destroyAll();
-          Toast.error(data.errMsg);
-          return;
-        }
+      // window.serialAPI.on('serial:write', async (data: any) => {
+      //   console.log(data,'data')
+      //   if (data && data.err) {
+      //     changeCurrentTest(task.id, {
+      //       status: 'fail',
+      //     });
+      //     resolve(false);
+      //     Toast.destroyAll();
+      //     Toast.error(data.errMsg);
+      //     return;
+      //   }
 
-        if (task.type === 'auto') {
-          setTimeout(() => {
-            changeCurrentTest(task.id, {
-              status: 'success',
-            });
-            resolve(true);
-          }, 2000);
-        } else if (task.type === 'ack') {
-          Modal.destroyAll();
-          Modal.confirm({
-            title: '提示',
-            content: task.tip,
-            maskClosable: false,
-            closable: false,
-            okText: '是',
-            cancelText: '否',
-            onOk: () => {
-              changeCurrentTest(task.id, {
-                status: 'success',
-              });
-              resolve(true);
-            },
-            onCancel: () => {
-              changeCurrentTest(task.id, {
-                status: 'fail',
-              });
-              resolve(true);
-            },
-          });
-        } else if (task.type === 'tip') {
-          Toast.destroyAll();
-          Toast.info(task.tip);
-          setTimeout(() => {
-            changeCurrentTest(task.id, {
-              status: 'success',
-            });
-            resolve(true);
-          }, 2000);
-        } else {
+
+      // });
+
+      if (task.type === 'auto') {
+        console.log('ccc')
+        setTimeout(() => {
+          console.log('abc')
           changeCurrentTest(task.id, {
-            status: 'fail',
+            status: 'success',
           });
-          resolve(false);
-        }
-      });
+          console.log('ddd')
+          resolve(true);
+        }, 2000);
+      } else if (task.type === 'ack') {
+        Modal.destroyAll();
+        Modal.confirm({
+          title: '提示',
+          content: task.tip,
+          maskClosable: false,
+          closable: false,
+          okText: '是',
+          cancelText: '否',
+          onOk: () => {
+            changeCurrentTest(task.id, {
+              status: 'success',
+            });
+            resolve(true);
+          },
+          onCancel: () => {
+            changeCurrentTest(task.id, {
+              status: 'fail',
+            });
+            resolve(true);
+          },
+        });
+      } else if (task.type === 'tip') {
+        Toast.destroyAll();
+        Toast.info(task.tip);
+        setTimeout(() => {
+          changeCurrentTest(task.id, {
+            status: 'success',
+          });
+          resolve(true);
+        }, 2000);
+      } else {
+        changeCurrentTest(task.id, {
+          status: 'fail',
+        });
+        resolve(false);
+      }
     });
   };
 
   // 重置测试项目
   const resetTestItem = () => {
+    window.serialAPI.close();
     setStart(false);
     test = testData.CHECK_OUT;
     setTest(testData.CHECK_OUT);
@@ -123,14 +131,16 @@ export default (props: Props) => {
       }
     });
     window.serialAPI.read((_: any, data: any) => {
+      console.log(data, 'data');
       const respond = Uint8ArrayToString(data);
+      console.log(respond, 'respond')
       Toast.destroyAll();
       Toast.info(respond);
     });
   };
 
   const startTask = async () => {
-    for (let task of Object.values(test)) {
+    for (const task of Object.values(test)) {
       console.log(task, 'task=>');
       await runTask(task);
     }
@@ -138,16 +148,24 @@ export default (props: Props) => {
   };
 
   const runTask = (task: CheckOutObj) => {
+    console.log('111')
     setCurrentTest(task.id);
     changeCurrentTest(task.id, {
       status: 'loading',
     });
+    console.log('2222')
     return sendMsg(task);
   };
 
   const hasSelectPort = () => !port;
 
   const portSelectChange = (port: string) => setPort(port);
+
+  useEffect(()=>{
+    return ()=>{
+      window.serialAPI.close();
+    }
+  },[])
 
   return (
     <Space vertical>

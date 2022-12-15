@@ -60,18 +60,25 @@ ipcMain.on('serial:open', (event, path:string, bRate:number) => {
   })
 })
 
+
 ipcMain.on('serial:write', (event, buf) => {
   sPort.write(buf, (err: any)=>{
     err?console.log("port err", err, "\n"):null;
-      event.reply('serial:write',err? {
+    console.log(err,'err')
+      event.reply('serial:write',JSON.stringify(err? {
         err: true,
         errMsg: '测试命令发送失败！'
       }:{
         err: false,
         data: path
-      })
+      }))
   });
 })
+
+ipcMain.on('serial:close', (event)=>{
+  sPort.close()
+})
+
 
 
 if (process.env.NODE_ENV === 'production') {
@@ -164,6 +171,7 @@ app.on('window-all-closed', () => {
   // after all windows have been closed
   if (process.platform !== 'darwin') {
     app.quit();
+    sPort.close();
   }
 });
 

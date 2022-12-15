@@ -23,6 +23,7 @@ See [this commit](https://github.com/amilajack/erb-serialport-example/commit/ead
 
 ```
 https://serialport.io/docs/api-serialport
+https://blog.csdn.net/Naisu_kun/article/details/121492829
 ```
 
 2. electron 进程通信
@@ -42,6 +43,12 @@ https://semi.design/zh-CN/
 ```
 https://github.com/amilajack/erb-serialport-example
 ```
+
+5. 串口调试
+
+- 串口调试工具ComTools http://www.youxiaxiazai.com/soft/77/7399.html#dzhi
+
+- VSPD虚拟串口工具 https://blog.csdn.net/qq_34202873/article/details/88391265#VSPD_11
 
 ## 打包
 

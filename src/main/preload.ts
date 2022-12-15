@@ -48,5 +48,8 @@ contextBridge.exposeInMainWorld('serialAPI',{
     }
     return undefined;
   },
+  close: ()=>{
+    ipcRenderer.on('serial:close', null)
+  },
 })
 
