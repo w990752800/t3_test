@@ -1,0 +1,15 @@
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  /* background: linear-gradient(200.96deg,
+      #fedc2a -29.09%,
+      #dd5789 51.77%,
+      #7a2c9e 129.35%);
+  background-color: #7a2c9e; */
+  background-color: #f9f9f9;
+  display: flex;
+  overflow-y: scroll;
+  justify-content: center;
+  box-sizing: border-box;
+}
